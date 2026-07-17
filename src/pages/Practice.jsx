@@ -26,54 +26,17 @@ export default function Practice() {
     setFeedback("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setFeedback("");
 
-    try {
-      console.log("Checking API Key:");
-      console.log("IS the key present?", !!import.meta.env.VITE_OPENAI_API_KEY);
-      const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are an expert interviewer. Provide constructive feedback on the user's answer.",
-              },
-              {
-                role: "user",
-                content: `Question: Tell me about your experience with React. Answer: ${transcript}`,
-              },
-            ],
-          }),
-        },
-      );
-
-      const data = await response.json();
-
-      if (data.choices && data.choices.length > 0) {
-        setFeedback(data.choices[0].message.content);
-      } else {
-        setFeedback("Error: Received no response from AI.");
-      }
-    } catch (error) {
-      console.error("API Error:", error);
+    setTimeout(() => {
       setFeedback(
-        "Failed to get feedback. Please check your connection or API key settings.",
+        "Good answer! Try adding a specific React project you worked on and explaining what you personally built.",
       );
-    } finally {
       setLoading(false);
-    }
+    }, 1000);
   };
 
   return (
@@ -108,10 +71,12 @@ export default function Practice() {
             if (listening) {
               SpeechRecognition.stopListening();
             } else {
-              SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
+              SpeechRecognition.startListening({
+                continuous: true,
+                language: "en-US",
+              });
             }
           }}
-       
           className={`px-6 py-2 rounded-lg text-white ${listening ? "bg-red-600" : "bg-blue-600"}`}
         >
           {listening ? "Stop Listening" : "Start Speaking"}
