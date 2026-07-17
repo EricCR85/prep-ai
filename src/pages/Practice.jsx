@@ -27,11 +27,14 @@ export default function Practice() {
   };
 
   const handleSubmit = async (e) => {
-    e.prevent.Default();
+    e.preventDefault();
     setLoading(true);
     setFeedback("");
 
     try {
+      console.log("Checking API Key:");
+      console.log("IS the key present?", !!import.meta.env.VITE_OPENAI_API_KEY);
+      console.log("Full Key Value:", import.meta.env.VITE_OPENAI_API_KEY);
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
         {
@@ -102,11 +105,14 @@ export default function Practice() {
 
       <div className="flex space-x-4 mb-6">
         <button
-          onClick={
-            listening
-              ? SpeechRecognition.stopListening
-              : SpeechRecognition.startListening
-          }
+          onClick={() => {
+            if (listening) {
+              SpeechRecognition.stopListening();
+            } else {
+              SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
+            }
+          }}
+       
           className={`px-6 py-2 rounded-lg text-white ${listening ? "bg-red-600" : "bg-blue-600"}`}
         >
           {listening ? "Stop Listening" : "Start Speaking"}
