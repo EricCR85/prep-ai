@@ -1,16 +1,39 @@
-# React + Vite
+# 🚀 PrepAI: Intelligent Mock Interviewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+PrepAI is a sleek, React-based mock interview platform designed to help developers practice technical communication under pressure. By leveraging the Web Speech API and intelligent feedback loops, PrepAI provides an immediate, real-time simulated environment for refining interview responses.
 
-Currently, two official plugins are available:
+## 🛠 Tech Stack
+* **Frontend:** React, Tailwind CSS
+* **Speech Processing:** `react-speech-recognition`
+* **State Management:** React Hooks (`useState`, `useEffect`, `useCallback`)
+* **Deployment:** Vercel
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🔑 Key Features
+* **Real-time Speech Analysis:** Captures and transcribes responses instantly using the Web Speech API.
+* **Visual Feedback Loop:** Integrated pulsing UI indicators that provide clear feedback when the microphone is active.
+* **Performance Dashboard:** Tracks progress across multiple sessions, allowing users to review AI-generated feedback and identify areas for improvement.
+* **Resilient Design:** Implemented robust error handling, including toast notifications and automatic state persistence via `localStorage`.
 
-## React Compiler
+## ⚙️ How to Run Locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Clone the repository:**
+```bash
+git clone [https://github.com/EricCR85/prep-ai.git](https://github.com/EricCR85/prep-ai.git)
+cd prep-ai
+```
+2. **Install dependencies:**
+```bash
+npm install
+```
+3. **Start the development server:**
+```bash
+npm run dev
+```
 
-## Expanding the ESLint configuration
+## 💡 Engineering Highlights
+* **Performance Optimization:** Resolved cascading rendering issues by utilizing lazy initialization for state and optimizing dependency arrays.
+* **UI/UX Refinement:** Designed a production-ready interface with custom loading states, empty state management, and responsive CSS animations.
+* **Code Quality:** Strictly maintained a lint-free codebase by effectively managing React hooks and side effects.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+*Built with passion for better interview preparation.*

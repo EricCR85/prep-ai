@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -30,7 +30,7 @@ export default function Practice() {
 
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); // Added Error State
+  const [error, setError] = useState(null);
   const [timeLeft, setTimeLeft] = useState(60);
   const [answerText, setAnswerText] = useState("");
 
@@ -40,6 +40,59 @@ export default function Practice() {
     resetTranscript,
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
+
+  const handleReset = useCallback(() => {
+    resetTranscript();
+    setAnswerText("");
+    setFeedback("");
+    setTimeLeft(60);
+  }, [resetTranscript]);
+
+  const handleSubmit = useCallback(
+    async (isAutoSubmit = false) => {
+      if (!answerText && !isAutoSubmit) return;
+      const textToSubmit =
+        answerText || "No answer provided within time limit.";
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await getAiFeedback(
+          questions[currentQuestionIndex],
+          textToSubmit,
+        );
+        setAllFeedback((prev) => [
+          ...prev,
+          { question: questions[currentQuestionIndex], feedback: result },
+        ]);
+        setFeedback(result);
+      } catch (err) {
+        setError("Failed to get feedback. Please check your connection.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [answerText, questions, currentQuestionIndex],
+  );
+
+  const handleRestart = () => {
+    localStorage.removeItem("prep-ai-index");
+    localStorage.removeItem("prep-ai-feedback");
+    localStorage.removeItem("prep-ai-status");
+    setInterviewStatus("idle");
+    setCurrentQuestionIndex(0);
+    setAllFeedback([]);
+    handleReset();
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      handleReset();
+    } else {
+      setInterviewStatus("finished");
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem("prep-ai-index", currentQuestionIndex);
@@ -59,65 +112,16 @@ export default function Practice() {
     if (interviewStatus === "interviewing" && timeLeft > 0) {
       timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     } else if (timeLeft === 0 && interviewStatus === "interviewing") {
-      handleSubmit(true);
+      setTimeout(() => handleSubmit(true), 0);
     }
     return () => clearInterval(timer);
-  }, [timeLeft, interviewStatus]);
+  }, [timeLeft, interviewStatus, handleSubmit]);
 
   useEffect(() => {
     if (listening) {
-      setAnswerText(transcript);
+      setTimeout(() => setAnswerText(transcript), 0);
     }
   }, [transcript, listening]);
-
-  const handleReset = () => {
-    resetTranscript();
-    setAnswerText("");
-    setFeedback("");
-    setTimeLeft(60);
-  };
-
-  const handleRestart = () => {
-    localStorage.removeItem("prep-ai-index");
-    localStorage.removeItem("prep-ai-feedback");
-    localStorage.removeItem("prep-ai-status");
-    setInterviewStatus("idle");
-    setCurrentQuestionIndex(0);
-    setAllFeedback([]);
-    handleReset();
-  };
-
-  const handleSubmit = async (isAutoSubmit = false) => {
-    if (!answerText && !isAutoSubmit) return;
-    const textToSubmit = answerText || "No answer provided within time limit.";
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await getAiFeedback(
-        questions[currentQuestionIndex],
-        textToSubmit,
-      );
-      setAllFeedback((prev) => [
-        ...prev,
-        { question: questions[currentQuestionIndex], feedback: result },
-      ]);
-      setFeedback(result);
-    } catch (err) {
-      setError("Failed to get feedback. Please check your connection.");
-      console.error("Error getting feedback:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      handleReset();
-    } else {
-      setInterviewStatus("finished");
-    }
-  };
 
   if (!browserSupportsSpeechRecognition) {
     return (
@@ -159,32 +163,27 @@ export default function Practice() {
               }}
             ></div>
           </div>
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-gray-500">
-              Question {currentQuestionIndex + 1} of {questions.length}
-            </p>
-            <div
-              className={`font-mono font-bold ${timeLeft < 10 ? "text-red-600 animate-pulse" : "text-blue-600"}`}
-            >
-              Time: {timeLeft}s
-            </div>
-          </div>
+
           <p className="text-xl font-medium mb-6">
             {questions[currentQuestionIndex]}
           </p>
-          <div className="bg-gray-100 p-4 rounded-lg min-h-[100px] mb-4 flex items-start relative overflow-hidden">
-            <textarea
-              value={answerText}
-              onChange={(e) => setAnswerText(e.target.value)}
-              placeholder={
-                listening
-                  ? "Listening..."
-                  : "Click Start Speaking or type your answer here..."
-              }
-              className="relative z-10 w-full bg-transparent text-gray-800 font-medium resize-none focus:outline-none"
-              rows={3}
-            />
-          </div>
+
+          <textarea
+            value={answerText}
+            onChange={(e) => setAnswerText(e.target.value)}
+            className={`w-full bg-gray-100 p-4 rounded-lg mb-4 focus:outline-none border-2 transition-all duration-300 ${
+              listening
+                ? "border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse"
+                : "border-transparent"
+            }`}
+            placeholder={
+              listening
+                ? "Listening to your response..."
+                : "Click Start Speaking or type your answer here..."
+            }
+            rows={3}
+          />
+
           <div className="flex space-x-4">
             <button
               onClick={() =>
@@ -198,50 +197,26 @@ export default function Practice() {
             </button>
             <button
               onClick={() => handleSubmit(false)}
-              disabled={!answerText || loading}
-              className="flex items-center justify-center px-6 py-2 bg-green-600 text-white rounded-lg disabled:bg-gray-400 transition-colors"
+              disabled={loading}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg"
             >
-              {loading ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    ></path>
-                  </svg>
-                  Analyzing...
-                </>
-              ) : (
-                "Submit Answer"
-              )}
+              {loading ? "Analyzing..." : "Submit"}
             </button>
             <button
               onClick={handleNext}
               className="px-6 py-2 bg-purple-600 text-white rounded-lg"
             >
-              Next Question
+              Next
             </button>
           </div>
+
           {feedback && (
             <div
               aria-live="polite"
               className="bg-blue-50 p-4 mt-6 rounded border border-blue-200"
             >
-              <span className="font-bold">AI Feedback:</span> {feedback}
+              <span className="font-bold text-blue-900">AI Feedback:</span>
+              <p className="text-blue-800 mt-1">{feedback}</p>
             </div>
           )}
         </div>
@@ -254,12 +229,10 @@ export default function Practice() {
             onClick={handleRestart}
             className="px-6 py-2 bg-gray-800 text-white rounded-lg"
           >
-            Restart Session
+            Restart
           </button>
         </div>
       )}
     </div>
   );
 }
-
-

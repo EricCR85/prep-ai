@@ -1,16 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Trash2, Mic } from "lucide-react";
 
 export default function Dashboard() {
-  const [feedbackHistory, setFeedbackHistory] = useState([]);
-
-  useEffect(() => {
+ 
+  const [feedbackHistory, setFeedbackHistory] = useState(() => {
     const savedFeedback = localStorage.getItem("prep-ai-feedback");
-    if (savedFeedback) {
-      setFeedbackHistory(JSON.parse(savedFeedback));
-    }
-  }, []);
+    return savedFeedback ? JSON.parse(savedFeedback) : [];
+  });
 
   const clearHistory = () => {
     localStorage.removeItem("prep-ai-feedback");
