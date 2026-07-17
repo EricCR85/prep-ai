@@ -34,7 +34,6 @@ export default function Practice() {
     try {
       console.log("Checking API Key:");
       console.log("IS the key present?", !!import.meta.env.VITE_OPENAI_API_KEY);
-      console.log("Full Key Value:", import.meta.env.VITE_OPENAI_API_KEY);
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
         {
