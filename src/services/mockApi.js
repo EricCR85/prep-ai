@@ -1,4 +1,3 @@
-
 export const roleQuestions = {
   "Frontend Engineer": [
     "Explain the difference between the Virtual DOM and the real DOM in React.",
@@ -17,6 +16,31 @@ export const roleQuestions = {
   ],
 };
 
+const feedbackVariations = [
+  {
+    generalFeedback:
+      "Excellent conceptual breakdown. You handled the core definitions well.",
+    strengths: "Great use of technical terminology and clear structure.",
+    improvements:
+      "Try mentioning a specific framework feature or hooks to back up this concept.",
+  },
+  {
+    generalFeedback:
+      "Good response. You clearly understand the operational lifecycle here.",
+    strengths:
+      "Spoke confidently and got straight to the primary point of the question.",
+    improvements:
+      "Consider outlining edge cases or error handling scenarios next time.",
+  },
+  {
+    generalFeedback:
+      "Solid answer attempt. You addressed the primary engineering trade-offs nicely.",
+    strengths: "Strong analytical breakdown and logical structure.",
+    improvements:
+      "Try providing a structural real-world architecture example to reinforce your explanations.",
+  },
+];
+
 export const getAiFeedback = (question, transcript) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -28,16 +52,15 @@ export const getAiFeedback = (question, transcript) => {
         ),
       );
 
+      const randomIndex = Math.floor(Math.random() * feedbackVariations.length);
+      const selectedFeedback = feedbackVariations[randomIndex];
+
       resolve({
         score,
-        generalFeedback: `Solid answer attempt. You addressed the core parameters of "${question.substring(0, 30)}...".`,
-        strengths:
-          "Clear communication cadence and good use of relevant developer keywords.",
-        improvements:
-          "Try providing a structural real-world architecture example to reinforce your explanations.",
+        generalFeedback: `${selectedFeedback.generalFeedback} You addressed "${question.substring(0, 35)}...".`,
+        strengths: selectedFeedback.strengths,
+        improvements: selectedFeedback.improvements,
       });
-    }, 2000);
+    }, 1500);
   });
 };
-
-
