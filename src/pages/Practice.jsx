@@ -5,11 +5,7 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import { getAiFeedback, roleQuestions } from "../services/mockApi";
 
-export default function Practice() {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("prep-ai-theme") || "light";
-  });
-
+export default function Practice({ theme, setTheme }) {
   const [role, setRole] = useState(() => {
     return localStorage.getItem("prep-ai-role") || "Frontend Engineer";
   });
@@ -55,10 +51,6 @@ export default function Practice() {
     setQuestions(roleQuestions[role]);
     localStorage.setItem("prep-ai-role", role);
   }, [role]);
-
-  useEffect(() => {
-    localStorage.setItem("prep-ai-theme", theme);
-  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
@@ -177,10 +169,8 @@ export default function Practice() {
   }
 
   return (
-    <div
-      className={`min-h-screen p-8 transition-colors duration-300 ${theme === "dark" ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"}`}
-    >
-      <div className="absolute top-6 right-8">
+    <div className="p-8 max-w-2xl mx-auto relative">
+      <div className="absolute top-6 right-0">
         <button
           onClick={toggleTheme}
           className={`px-4 py-2 rounded-lg text-xs font-bold tracking-wide transition ${theme === "dark" ? "bg-gray-800 text-yellow-400 border border-gray-700" : "bg-white text-gray-800 shadow-sm border"}`}
