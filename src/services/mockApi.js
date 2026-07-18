@@ -1,42 +1,43 @@
-export const difficultyQuestions = {
-  Beginner: [
-    "Tell me about your experience with React.",
-    "What are HTML semantic tags and why do we use them?",
-    "Explain the difference between let, const, and var in JavaScript.",
+
+export const roleQuestions = {
+  "Frontend Engineer": [
+    "Explain the difference between the Virtual DOM and the real DOM in React.",
+    "What are semantic HTML tags, and why are they important for accessibility and SEO?",
+    "How do you handle performance optimization and state management in a massive React application?",
   ],
-  Intermediate: [
-    "Explain the difference between state and props.",
-    "What is the Virtual DOM and how does it work?",
-    "How does asynchronous code work in JavaScript using Promises or Async/Await?",
+  "Backend Engineer": [
+    "Explain how asynchronous programming works in JavaScript via the event loop.",
+    "What is the difference between SQL and NoSQL databases, and when would you choose each?",
+    "How do you secure RESTful API endpoints from malicious attacks or excessive requests?",
   ],
-  Advanced: [
-    "How do you optimize a React app that suffers from slow rendering issues?",
-    "Explain closures in JavaScript and provide a practical real-world production use case.",
-    "How would you handle global state management across an enterprise micro-frontend application?",
+  "Full Stack Engineer": [
+    "Describe the entire request-response lifecycle when a user types a URL into their browser.",
+    "How do you handle authentication, sessions, and state synchronization across the client and server?",
+    "What is your approach to structuring database schemas alongside highly dynamic UI components?",
   ],
 };
 
 export const getAiFeedback = (question, transcript) => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const performanceScore = Math.min(
+      const score = Math.min(
         98,
         Math.max(
-          65,
-          Math.floor(65 + (transcript?.length || 0) * 0.1 + Math.random() * 10),
+          62,
+          Math.floor(65 + (transcript?.length || 0) * 0.12 + Math.random() * 8),
         ),
       );
 
-      const feedbackData = {
-        score: performanceScore,
-        generalFeedback: `Good job formulating your explanation for "${question.substring(0, 25)}...". Your answer demonstrated fundamental knowledge.`,
+      resolve({
+        score,
+        generalFeedback: `Solid answer attempt. You addressed the core parameters of "${question.substring(0, 30)}...".`,
         strengths:
-          "You spoke clearly and integrated vital industry terminology directly into your presentation framework.",
+          "Clear communication cadence and good use of relevant developer keywords.",
         improvements:
-          "Consider adding specific production-level examples or edge-case handling scenarios to maximize depth.",
-      };
-
-      resolve(feedbackData);
+          "Try providing a structural real-world architecture example to reinforce your explanations.",
+      });
     }, 2000);
   });
 };
+
+
