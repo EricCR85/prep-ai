@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Trash2, Mic } from "lucide-react";
 
 export default function Dashboard() {
- 
   const [feedbackHistory, setFeedbackHistory] = useState(() => {
     const savedFeedback = localStorage.getItem("prep-ai-feedback");
     return savedFeedback ? JSON.parse(savedFeedback) : [];
@@ -11,6 +10,8 @@ export default function Dashboard() {
 
   const clearHistory = () => {
     localStorage.removeItem("prep-ai-feedback");
+    localStorage.removeItem("prep-ai-index");
+    localStorage.removeItem("prep-ai-status");
     setFeedbackHistory([]);
   };
 
@@ -54,15 +55,52 @@ export default function Dashboard() {
               key={index}
               className="bg-white p-6 rounded-lg shadow-sm border border-gray-200"
             >
-              <h3 className="text-lg font-semibold text-blue-800 mb-2">
-                Question {index + 1}
-              </h3>
-              <p className="text-gray-700 mb-4">{item.question}</p>
-              <div className="bg-blue-50 p-4 rounded-md">
-                <span className="font-bold text-sm text-blue-900">
-                  AI Feedback:
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="text-lg font-semibold text-blue-800">
+                  Question {index + 1}
+                </h3>
+
+                {item.feedback?.score && (
+                  <span
+                    className={`text-sm font-bold px-3 py-1 rounded-full ${
+                      item.feedback.score >= 85
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    Score: {item.feedback.score}/100
+                  </span>
+                )}
+              </div>
+
+              <p className="text-gray-700 mb-4 font-medium italic">
+                "{item.question}"
+              </p>
+
+
+              <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-md space-y-2">
+                <span className="font-bold text-xs uppercase tracking-wider text-blue-900 block">
+                  AI Feedback Analysis
                 </span>
-                <p className="text-blue-800 italic mt-1">{item.feedback}</p>
+
+                <p className="text-sm text-gray-700">
+                  <strong className="text-blue-800">Summary:</strong>{" "}
+                  {item.feedback?.generalFeedback || item.feedback}
+                </p>
+
+                {item.feedback?.strengths && (
+                  <p className="text-sm text-gray-700">
+                    <strong className="text-green-700">✓ Strengths:</strong>{" "}
+                    {item.feedback.strengths}
+                  </p>
+                )}
+
+                {item.feedback?.improvements && (
+                  <p className="text-sm text-gray-700">
+                    <strong className="text-amber-700">⚠ Improvements:</strong>{" "}
+                    {item.feedback.improvements}
+                  </p>
+                )}
               </div>
             </div>
           ))}
